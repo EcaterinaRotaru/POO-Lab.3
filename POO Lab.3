@@ -1,0 +1,211 @@
+//Laborator nr.3 sarc.1
+#include <iostream>
+
+class NumarIntreg {
+private:
+    int valoare;
+
+public:
+    // Constructor implicit
+    NumarIntreg() : valoare(0) {}
+
+    // Constructor cu un parametru
+    NumarIntreg(int val) : valoare(val) {}
+
+    // Metoda pentru pre-increment
+    NumarIntreg& operator++() {
+        // Incrementare pre-increment
+        ++valoare;
+        return *this;
+    }
+
+    // Metoda pentru post-increment
+    NumarIntreg operator++(int) {
+        // Incrementare post-increment
+        NumarIntreg temp(*this);
+        ++valoare;
+        return temp;
+    }
+
+    // Metoda pentru operatorul +
+    NumarIntreg operator+(const NumarIntreg& other) const {
+        // Adunare cu un alt numar intreg
+        return NumarIntreg(valoare + other.valoare);
+    }
+
+    // Metoda pentru operatorul + cu un intreg predefinit
+    NumarIntreg operator+(int num) const {
+        // Adunare cu un intreg predefinit
+        return NumarIntreg(valoare + num);
+    }
+
+    // Funcție prietenă pentru operatorul --
+    friend NumarIntreg operator--(NumarIntreg& num, int) {
+        // Incrementare post-decrement
+        NumarIntreg temp = num;
+        num.valoare--;
+        return temp;
+    }
+
+    // Funcție prietenă pentru operatorul -
+    friend NumarIntreg operator-(const NumarIntreg& num1, const NumarIntreg& num2) {
+        // Scădere între două numere întregi
+        return NumarIntreg(num1.valoare - num2.valoare);
+    }
+
+    // Metoda pentru afișarea valorii
+    void afisare() const {
+        std::cout << "Valoare: " << valoare << std::endl;
+    }
+};
+
+int main() {
+    NumarIntreg a(5);
+    NumarIntreg b(3);
+
+    // Utilizarea operatorilor
+    NumarIntreg c = a + b;
+    c.afisare(); // Afiseaza: Valoare: 8
+
+    ++c;
+    c.afisare(); // Afiseaza: Valoare: 9
+
+    NumarIntreg d = c++;
+    d.afisare(); // Afiseaza: Valoare: 9
+    c.afisare(); // Afiseaza: Valoare: 10
+
+    NumarIntreg e = a - b;
+    e.afisare(); // Afiseaza: Valoare: 2
+
+    NumarIntreg f = a + 10;
+    f.afisare(); // Afiseaza: Valoare: 15
+
+    return 0;
+}
+
+//Laborator nr.3 sarc.2
+#include <iostream>
+#include <sstream> 
+#include <set>
+
+class Set {
+private:
+    std::set<int> elements;
+
+public:
+    // Constructor implicit
+    Set() {}
+
+    // Constructor cu o lista de initializare
+    Set(std::initializer_list<int> initList) : elements(initList) {}
+
+    // Supraincarcare operator +=
+    void operator+=(int element) {
+        elements.insert(element);
+    }
+
+    // Supraincarcare operator +
+    friend Set operator+(const Set& set1, const Set& set2) {
+        Set result = set1;
+        result.elements.insert(set2.elements.begin(), set2.elements.end());
+        return result;
+    }
+
+    // Supraincarcare operator *
+    friend Set operator*(const Set& set1, const Set& set2) {
+        Set result;
+        for (int element : set1.elements) {
+            if (set2.elements.find(element) != set2.elements.end()) {
+                result.elements.insert(element);
+            }
+        }
+        return result;
+    }
+
+    // Supraincarcare operator -
+    friend Set operator-(const Set& set1, const Set& set2) {
+        Set result = set1;
+        for (int element : set2.elements) {
+            result.elements.erase(element);
+        }
+        return result;
+    }
+
+    // Supraincarcare operator ==
+    bool operator==(const Set& other) const {
+        return elements == other.elements;
+    }
+
+    // Supraincarcare operator !=
+    bool operator!=(const Set& other) const {
+        return !(*this == other);
+    }
+
+    // Functie pentru verificarea apartenentei unui element la multime
+    bool contains(int element) const {
+        return elements.find(element) != elements.end();
+    }
+
+    // Supraincarcare operator <<
+    friend std::ostream& operator<<(std::ostream& os, const Set& set) {
+        os << "{ ";
+        for (int element : set.elements) {
+            os << element << " ";
+        }
+        os << "}";
+        return os;
+    }
+
+    // Supraincarcare operator >>
+    friend std::istream& operator>>(std::istream& is, Set& set) {
+        std::string line;
+        std::getline(is, line);
+        std::istringstream iss(line);
+
+        int element;
+        while (iss >> element) {
+            set += element;
+        }
+        return is;
+    }
+};
+
+int main() {
+    Set set1 = { 1, 2, 3, 4 };
+    Set set2 = { 3, 4, 5, 6 };
+
+    // Testarea operatorilor
+    Set unionSet = set1 + set2;
+    Set intersectionSet = set1 * set2;
+    Set differenceSet = set1 - set2;
+
+    std::cout << "set1: " << set1 << std::endl;
+    std::cout << "set2: " << set2 << std::endl;
+    std::cout << "Union: " << unionSet << std::endl;
+    std::cout << "Intersection: " << intersectionSet << std::endl;
+    std::cout << "Difference: " << differenceSet << std::endl;
+
+    // Testare operatori +=
+    set1 += 5;
+    std::cout << "After adding 5 to set1: " << set1 << std::endl;
+
+    // Testare operatori == si !=
+    Set set3 = { 1, 2, 3, 4 };
+    Set set4 = { 1, 2, 3, 4 };
+    Set set5 = { 1, 2, 3, 5 };
+
+    std::cout << "set3 == set4: " << (set3 == set4) << std::endl;
+    std::cout << "set3 != set5: " << (set3 != set5) << std::endl;
+
+    // Testare functie contains
+    std::cout << "set3 contains 3: " << set3.contains(3) << std::endl;
+    std::cout << "set3 contains 5: " << set3.contains(5) << std::endl;
+
+    // Testare operator >>
+    Set set6;
+    std::cout << "Enter elements for set6 (separated by space): ";
+    std::cin >> set6;
+    std::cout << "set6: " << set6 << std::endl;
+
+    return 0;
+}
